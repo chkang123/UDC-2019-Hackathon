@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var axios = require('axios');
 var dbconfig = require('../config/database.js');
 var con = mysql.createConnection(dbconfig);
 var auth = require('./auth')
@@ -32,7 +33,7 @@ exports.login = (req, res) => {
     }
   })
   */
-  con.query('SELECT User_Name FROM User WHERE User_Email = "' + email + '" AND User_Password = "' + password + '"', function(err, respond) {
+  con.query('SELECT (User_Name, User_ID) FROM User WHERE User_Email = "' + email + '" AND User_Password = "' + password + '"', function(err, respond) {
     if (err) {
       res.status(401).json({error: err})
     }
@@ -47,4 +48,33 @@ exports.login = (req, res) => {
       }
     }
   })
+}
+
+exports.register = (req, res) => {
+  let sql = "INSERT INTO User (User_Name, User_Email, User_Password, Place, User_Type) VALUES ?";
+  let values = [[req.body.name, req.body.email, req.body.password, req.body.place, 1]];
+  con.query(sql, [values], function(err, temp) {
+    if (err) {
+      res.status(401).json({error: err})
+    }
+    else {
+      con.query('SELECT User_ID FROM User WHERE User_Email = "' + req.body.email + '" AND User_Password = "' + req.body.password + '"', function(err, respond) {
+        if (err) {
+          res.status(401).json({error: err})
+        }
+        else{
+          console.log(respond)
+          
+          
+        }
+      })
+    }
+  })
+
+
+
+
+
+
+
 }
